@@ -11,6 +11,10 @@ inference/
 inference_results/
 output/
 
+*.pdopt
+*.pdiparams
+*.states
+
 *.DS_Store
 *.vs
 *.user
@@ -29,3 +33,5 @@ paddleocr.egg-info/
 /deploy/android_demo/app/PaddleLite/
 /deploy/android_demo/app/.cxx/
 /deploy/android_demo/app/cache/
+paddleocr.ipynb
+Shapely-1.6.4.post1-cp34-cp34m-win32.whl

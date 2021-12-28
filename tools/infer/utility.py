@@ -44,16 +44,16 @@ def init_args():
     parser.add_argument("--image_dir", type=str)
     parser.add_argument("--det_algorithm", type=str, default='DB')
     parser.add_argument("--det_model_dir", type=str)
-    parser.add_argument("--det_limit_side_len", type=float, default=960)
+    parser.add_argument("--det_limit_side_len", type=float, default=1365) #960================
     parser.add_argument("--det_limit_type", type=str, default='max')
 
     # DB parmas
-    parser.add_argument("--det_db_thresh", type=float, default=0.3)
-    parser.add_argument("--det_db_box_thresh", type=float, default=0.6)
+    parser.add_argument("--det_db_thresh", type=float, default=0.05) #0.3  0.05=========================
+    parser.add_argument("--det_db_box_thresh", type=float, default=0.1) #0.6  0.1========================
     parser.add_argument("--det_db_unclip_ratio", type=float, default=1.5)
     parser.add_argument("--max_batch_size", type=int, default=10)
-    parser.add_argument("--use_dilation", type=str2bool, default=False)
-    parser.add_argument("--det_db_score_mode", type=str, default="fast")
+    parser.add_argument("--use_dilation", type=str2bool, default=False) #false=====================
+    parser.add_argument("--det_db_score_mode", type=str, default="fast")#fast=========
     # EAST parmas
     parser.add_argument("--det_east_score_thresh", type=float, default=0.8)
     parser.add_argument("--det_east_cover_thresh", type=float, default=0.1)
@@ -68,17 +68,17 @@ def init_args():
     parser.add_argument("--rec_algorithm", type=str, default='CRNN')
     parser.add_argument("--rec_model_dir", type=str)
     parser.add_argument("--rec_image_shape", type=str, default="3, 32, 320")
-    parser.add_argument("--rec_char_type", type=str, default='ch')
+    parser.add_argument("--rec_char_type", type=str, default='chinese_cht') #ch=======================
     parser.add_argument("--rec_batch_num", type=int, default=6)
     parser.add_argument("--max_text_length", type=int, default=25)
     parser.add_argument(
         "--rec_char_dict_path",
         type=str,
         default="./ppocr/utils/ppocr_keys_v1.txt")
-    parser.add_argument("--use_space_char", type=str2bool, default=True)
+    parser.add_argument("--use_space_char", type=str2bool, default=True)#TRUE===========================
     parser.add_argument(
         "--vis_font_path", type=str, default="./doc/fonts/simfang.ttf")
-    parser.add_argument("--drop_score", type=float, default=0.5)
+    parser.add_argument("--drop_score", type=float, default=0.35) #0.5============================
 
     # params for e2e
     parser.add_argument("--e2e_algorithm", type=str, default='PGNet')

@@ -95,10 +95,19 @@ class RecResizeImg(object):
 
     def __call__(self, data):
         img = data['image']
-        if self.infer_mode and self.character_type == "ch":
+        
+        #auto rotate
+        dst_img_height, dst_img_width = img.shape[0:2]
+        if dst_img_height * 1.0 / dst_img_width >= 1.5:
+            img = np.rot90(img)
+        
+        #resize
+        if self.infer_mode and self.character_type == "chinese_cht": #ch
             norm_img = resize_norm_img_chinese(img, self.image_shape)
         else:
             norm_img = resize_norm_img(img, self.image_shape)
+
+            
         data['image'] = norm_img
         return data
 
@@ -254,6 +263,15 @@ def blur(img):
     else:
         return img
 
+def rotate(img):
+    """
+    rotate 90
+    """
+    h, w, _ = img.shape
+    if h * 1.0 / w >= 0.9 and h * 1.0 / w <= 1.1:
+        return np.rot90(img)
+    else:
+        return img
 
 def jitter(img):
     """
@@ -342,6 +360,7 @@ class Config:
         self.noise = True
         self.jitter = True
         self.blur = True
+        self.rotate = True
         self.color = True
 
 
@@ -461,6 +480,11 @@ def warp(img, ang, use_tia=True, prob=0.4):
     if config.blur:
         if random.random() <= prob:
             new_img = blur(new_img)
+
+    if config.rotate:
+        if random.random() <= prob:
+            new_img = rotate(new_img)
+            
     if config.color:
         if random.random() <= prob:
             new_img = cvtColor(new_img)

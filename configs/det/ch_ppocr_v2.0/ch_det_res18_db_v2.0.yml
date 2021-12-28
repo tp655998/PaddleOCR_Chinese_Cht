@@ -8,8 +8,8 @@ Global:
   # evaluation is run every 2000 iterations after the 3000th iteration
   eval_batch_step: [3000, 2000]
   cal_metric_during_train: False
-  pretrained_model: ./pretrain_models/ResNet18_vd_pretrained
-  checkpoints:
+  pretrained_model: ./pretrained/ch_db_res18/best_accuracy #=========載入pre-trained model
+  checkpoints: ./output/ch_db_res18/latest
   save_inference_dir:
   use_visualdl: False
   infer_img: doc/imgs_en/img_10.jpg
@@ -50,12 +50,12 @@ Optimizer:
     name: 'L2'
     factor: 0
 
-PostProcess:
+PostProcess: #========================================
   name: DBPostProcess
-  thresh: 0.3
-  box_thresh: 0.6
+  thresh: 0.3 #0.3
+  box_thresh: 0.6 #0.6
   max_candidates: 1000
-  unclip_ratio: 1.5
+  unclip_ratio: 1.5 #1.5
 
 Metric:
   name: DetMetric
@@ -64,10 +64,9 @@ Metric:
 Train:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data/icdar2015/text_localization/
-    label_file_list:
-      - ./train_data/icdar2015/text_localization/train_icdar2015_label.txt
-    ratio_list: [1.0]
+    data_dir: ./dataset/img
+    label_file_list: ['./dataset/det_train.txt']
+    ratio_list: [0.7] #1.0
     transforms:
       - DecodeImage: # load image
           img_mode: BGR
@@ -77,7 +76,7 @@ Train:
           augmenter_args:
             - { 'type': Fliplr, 'args': { 'p': 0.5 } }
             - { 'type': Affine, 'args': { 'rotate': [-10, 10] } }
-            - { 'type': Resize, 'args': { 'size': [0.5, 3] } }
+            - { 'type': Resize, 'args': { 'size': [0.5, 2.5] } } # 0.5~3.0=============================
       - EastRandomCropData:
           size: [960, 960]
           max_tries: 50
@@ -100,21 +99,22 @@ Train:
   loader:
     shuffle: True
     drop_last: False
-    batch_size_per_card: 8
+    batch_size_per_card: 1
     num_workers: 4
 
 Eval:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data/icdar2015/text_localization/
-    label_file_list:
-      - ./train_data/icdar2015/text_localization/test_icdar2015_label.txt
+    data_dir: ./dataset/img
+    label_file_list: ['./dataset/det_valid.txt']
     transforms:
       - DecodeImage: # load image
           img_mode: BGR
           channel_first: False
       - DetLabelEncode: # Class handling label
       - DetResizeForTest:
+          limit_side_len: 736
+          limit_type: min
 #           image_shape: [736, 1280]
       - NormalizeImage:
           scale: 1./255.
@@ -128,4 +128,4 @@ Eval:
     shuffle: False
     drop_last: False
     batch_size_per_card: 1 # must be 1
-    num_workers: 2
+    num_workers: 4

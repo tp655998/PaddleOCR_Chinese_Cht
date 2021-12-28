@@ -14,6 +14,7 @@
 import os
 import sys
 import subprocess
+import csv
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
@@ -46,6 +47,7 @@ class TextSystem(object):
         self.text_recognizer = predict_rec.TextRecognizer(args)
         self.use_angle_cls = args.use_angle_cls
         self.drop_score = args.drop_score
+        # self.drop_score = 0
         if self.use_angle_cls:
             self.text_classifier = predict_cls.TextClassifier(args)
 
@@ -111,6 +113,38 @@ def sorted_boxes(dt_boxes):
     return _boxes
 
 
+def write_csv(image_file, boxes, txts, csv_path):
+    '''
+    write answer csv
+    '''
+    rows = []
+    # 開啟 CSV 檔案
+
+    # 以迴圈輸出每一列
+    for index in range(len(txts)):
+        row = []
+
+        row.append(image_file)
+
+        for pos in boxes[index]:
+            for cor in pos:
+                row.append(int(cor))
+
+        row.append(txts[index])
+        rows.append(row)
+
+    with open(csv_path, 'a', newline='', encoding='utf-8') as csvfile:
+        # 建立 CSV 檔寫入器
+        writer = csv.writer(csvfile)
+        
+        # 寫入一列資料
+        for item in rows:
+            writer.writerow(item)
+            print(item)
+            
+    print('finish')
+
+
 def main(args):
     image_file_list = get_image_file_list(args.image_dir)
     image_file_list = image_file_list[args.process_id::args.total_process_num]
@@ -152,7 +186,21 @@ def main(args):
             boxes = dt_boxes
             txts = [rec_res[i][0] for i in range(len(rec_res))]
             scores = [rec_res[i][1] for i in range(len(rec_res))]
-
+            
+            #=====write csv=================================================================
+            # print('boxes', boxes)
+            # print('txts', txts)
+            # print('image', image_file)
+            img_id = image_file.split('/')[2]
+            img_id = img_id.split('.')[0]
+            # print('image_file', img_id)
+            
+            csv_folder_path = "./inference_results/"
+            os.makedirs(csv_folder_path, exist_ok=True)
+            csv_path = "./inference_results/test.csv"
+            write_csv(img_id, boxes, txts, csv_path)
+            #======================================================================
+            
             draw_img = draw_ocr_box_txt(
                 image,
                 boxes,
@@ -160,7 +208,7 @@ def main(args):
                 scores,
                 drop_score=drop_score,
                 font_path=font_path)
-            draw_img_save = "./inference_results/"
+            draw_img_save = "./inference_results/images/"
             if not os.path.exists(draw_img_save):
                 os.makedirs(draw_img_save)
             if flag:
@@ -176,6 +224,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+    print('============in the system====================')
     args = utility.parse_args()
     if args.use_mp:
         p_list = []
